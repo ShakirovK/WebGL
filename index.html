@@ -137,11 +137,11 @@
 
 
             //Опора рычага
-            var boxGeometry = new THREE.BoxGeometry(25,1500,25);
-            var boxMaterial = new THREE.MeshPhongMaterial({ color: 0x008000 });
-            var box = new THREE.Mesh(boxGeometry, boxMaterial);
-            box.position.set(-2500, -400, 0);
-            scene.add(box);
+            var Geometry = new THREE.CylinderGeometry(15,15,1500, 10);
+            var Material = new THREE.MeshPhongMaterial({ color: 0x808080 });
+            var leverSupport = new THREE.Mesh(Geometry, Material);
+            leverSupport.position.set(-2500, -400, 0);
+            scene.add(leverSupport);
 
             //рычаг
             var leverGeometry = new THREE.BoxGeometry(30,80,2000);
@@ -153,7 +153,7 @@
 
             //helperObject
             var helperObjectGeometry = new THREE.CylinderGeometry(10,10,32,10);
-            var helperObjectMaterial = new THREE.MeshPhongMaterial({ color: 0xffff00 });
+            var helperObjectMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
             helperObject = new THREE.Mesh( helperObjectGeometry, helperObjectMaterial );
             helperObject.position.set(-2500,200,0);
             helperObject.rotation.z = Math.PI / 2;
