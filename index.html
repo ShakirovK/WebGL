@@ -31,7 +31,6 @@
         const meh = new THREE.Group();
         const dragObjects = [];
         var array_pos = [];
-        var isAnimating = false;
         
         init();
         animate();
@@ -147,9 +146,9 @@
             var leverGeometry = new THREE.BoxGeometry(30,80,2000);
             var leverMaterial = new THREE.MeshPhongMaterial({ color: 0x804030 });
             var lever = new THREE.Mesh(leverGeometry, leverMaterial);
-            //lever.position.set(-2500, 200, 0);
+            //lever.position.set(0, 200, 0);
             
-            scene.add(lever);
+            //scene.add(lever);
 
             //helperObject
             var helperObjectGeometry = new THREE.CylinderGeometry(10,10,32,10);
@@ -166,14 +165,14 @@
             //груз1
             var sinker = new THREE.Group();
             var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.BoxGeometry(10,80,10);
+            var markGeometry = new THREE.BoxGeometry(10,200,10);
             var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 110, 0)
-            sinker.add(mark);
+            mark.position.set(0, 65, 0);
             var Geometry = new THREE.BoxGeometry(140,140,140);
             var Material = new THREE.MeshPhongMaterial({ color: 0xC0C0C0 });
             var obj = new THREE.Mesh(Geometry, Material);
             sinker.add(obj);
+            sinker.add(mark);
             sinker.position.set(-2000, -700, -500);
             sinker.force = 10;
             array_pos.push( new THREE.Vector3().copy( sinker.position ) );
@@ -192,23 +191,22 @@
             //груз3
             var sinker3 = new THREE.Group();
             var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.BoxGeometry(10,80,10);
+            var markGeometry = new THREE.BoxGeometry(10,200,10);
             var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 110, 0)
-            sinker3.add(mark);
+            mark.position.set(0, 65, 0)
             var Geometry = new THREE.BoxGeometry(70,70,70);
             var Material = new THREE.MeshPhongMaterial({ color: 0xC0C0C0 });
-            var obj = new THREE.Mesh(Geometry, Material);
-            obj.position.set(0, 40, 0)
+            var obj = new THREE.Mesh(Geometry, Material);;
             sinker3.add(obj);
-            sinker3.position.set(-2000, -770, 200);
+            sinker3.add(mark);
+            sinker3.position.set(-2000, -735, 200);
             sinker3.force = 5;
             array_pos.push( new THREE.Vector3().copy( sinker3.position ) );
             scene.add(sinker3);dragObjects.push( sinker3 );
 
             //груз4
             var sinker4 = sinker3.clone();
-            sinker4.position.set(-2000, -770, -200);
+            sinker4.position.set(-2000, -735, -200);
             sinker4.force = 5;
             array_pos.push( new THREE.Vector3().copy( sinker4.position ) );
             scene.add(sinker4);dragObjects.push( sinker4 );
@@ -218,12 +216,23 @@
             meh.position.set(-2500, 200, 0);
             meh.add(lever);
             scene.add(meh);
+
+
+
+            for (let i = -900; i <= 900; i += 200) {
+                const pos = new THREE.Group();
+                pos.name = i;  // Измените имя по своему усмотрению
+                pos.position.z = i;  // Rоордината z на основе счетчика цикла
+                pos.position.y = -200;
+                pos.force = 0;
+                meh.add(pos);
+            }
             
 
 
             //Рабочее поле вертикаольное
             var Material = new THREE.MeshPhongMaterial( { color: 0xD3D3D3, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
-            var Geometry = new THREE.PlaneGeometry( 2000, 1000, 1, 1111 );
+            var Geometry = new THREE.PlaneGeometry( 2000, 1500, 1, 1 );
             var Board = new THREE.Group();
             var checkerboard = new THREE.Mesh( Geometry, Material );
             checkerboard.position.x = -2500;
@@ -241,150 +250,50 @@
 
 
 
-            var array_newpos = [];
+            
             //Перемещение объектов
             eventControl = new EventControls( [ ... dragObjects ], camera, renderer.domElement );
             eventControl.setDraggable( render, true );              
             eventControl.setMap ( Board );
             eventControl.setOrbitControl( controls );          
-            
             eventControl.attachEvent( 'dragAndDrop', function () {
-                const MIN_Z = -900;
-                const MAX_Z = 900;
-                if (this.event.object.position.y > -20 ) {
-                    meh.remove(this.event.object);
-                    this.event.object.rotation.x = 0;
-                    scene.add(this.event.object);
-                    this.event.object.position.z = Math.max(MIN_Z, Math.min(MAX_Z, 300 + 200 * Math.round((this.event.object.position.z - 300) / 200)));
-                    this.event.object.position.y = 45;
-                    this.event.object.position.x = -2500;
-                    
-                } 
-                // else {
-                //     this.event.object.position.z = Math.max(MIN_Z, Math.min(MAX_Z, this.event.object.position.z));
-                // }
-                
+                this.event.object.parent.remove(this.event.object);
+                scene.add(this.event.object);
+                this.event.object.position.z = Math.max(-999, Math.min(999, this.event.object.position.z));
+                this.event.object.position.y = Math.max(-700, Math.min(200, this.event.object.position.y));
+                // if (this.event.object.position.y > -500 ) {
+                //     this.event.object.position.x = -2500;
+                // } 
             }); 
-            eventControl.attachEvent( 'click', function () {
-                if (this.event.object.position.x == 0) {
-                    meh.remove(this.event.object);
-                    this.event.object.rotation.x = 0;
-                    scene.add(this.event.object);
-                    this.event.object.position.x = -2500;
-                }
-                console.log( "object #" + this.event.item );
 
-            });
+
+            // eventControl.attachEvent( 'click', function () {
+            //     console.log( "object #" + this.event.item );
+            // });
             
             
             eventControl.attachEvent( 'mouseUp', function () {
-
-            if ( this.event.object.position.y > -20 && this.event.object.position.y < 90 && !array_newpos.includes(this.event.object.position.z)  ) { 
-                array_newpos[this.event.item] = this.event.object.position.z;
-                this.event.object.position.set(0, -155, array_newpos[this.event.item]);
-                this.event.object.rotation.x = (-1) * meh.rotation.x;
-                meh.add(this.event.object);
-                //momentum += this.event.object.position.z * this.event.object.force;
-                dvizh();
-            } else {
-                meh.remove(this.event.object);
-                this.event.object.rotation.x = 0;
-                scene.add(this.event.object);
-                this.event.object.position.copy( array_pos[ this.event.item ] ); 
-                render();
-                array_newpos[this.event.item] = NaN;
-            }
-            
-            if (this.event.object.position.z == -100 && this.event.object.position.y == 45){
-                animateRight();
-            } else {
-                animateLeft();
-                
-            }
-            
-            console.log('Координаты в массиве array_newpos=', array_newpos);
-            console.log('Позиция по z координате', this.event.object.position.z);
-
-            });
-            
-            
-            function dvizh() {
-
-                if (isAnimating){
-                    return;
+                if ( this.event.object.position.y > -700 && this.event.object.position.x != 0) { 
+                    this.event.object.parent.remove(this.event.object);
+                    scene.add(this.event.object);
+                    this.event.object.position.x = 0;
+                    this.event.object.position.z = 300 + 200 * Math.round((this.event.object.position.z - 300) / 200);
+                    for (let i = 1; i < meh.children.length; i++) {
+                        if (this.event.object.position.z == meh.children[i].position.z) {
+                            
+                            this.event.object.position.z = 0;
+                            meh.children[i].add(this.event.object)
+                        }
+                        for (let j = 0; j < meh.children[i].children.length; j++){
+                            meh.children[i].children[j].position.y = 30 - 180*j;
+                        };
+                    }
                 } else {
-                    animaka();
+                    this.event.object.parent.remove(this.event.object);
+                    scene.add(this.event.object);
+                    this.event.object.position.copy( array_pos[ this.event.item ] ); 
                 }
-            }
-            function animaka() {
-                var momentum = 0;
-                for ( let i = 1; i < meh.children.length; i++) {
-                    momentum += meh.children[i].position.z * meh.children[i].force;
-                }
-            
-                if (momentum == 0){
-                    
-                    if (meh.rotation.x < 0) {
-                        animateRight();
-                        isAnimating = true;
-                    } else if (meh.rotation.x > 0) {
-                        animateLeft();
-                        isAnimating = true;
-                    }
-                    
-                } else if (momentum < 0 ) {
-                    animateLeft()
-                    isAnimating = true;
-                } else if (momentum > 0 ) {
-                    animateRight()
-                    isAnimating = true;
-                }
-            
-                // ограничить вращение
-                if (meh.rotation.x > 0.2) {
-                    isAnimating = false;
-                    meh.rotation.x = 0.2;
-                    for (let i = 1; i < meh.children.length; i++) {
-                        meh.children[i].rotation.x = -0.2;
-                    }
-                    isAnimating = false;
-                } else if (meh.rotation.x < -0.2) {
-                    isAnimating = false;
-                    meh.rotation.x = -0.2;
-                    for (let i = 1; i < meh.children.length; i++) {
-                        meh.children[i].rotation.x = 0.2;
-                    }
-                    isAnimating = false;
-                } else if (Math.abs(meh.rotation.x) < 0.05 && momentum == 0) {
-                    isAnimating = false;
-                    meh.rotation.x = 0;
-                    for (let i = 1; i < meh.children.length; i++) {
-                        meh.children[i].rotation.x = 0;
-                    }
-                }
-                requestAnimationFrame(animaka);
-                console.log('Моментум = ', momentum);
-                console.log('При анимации meh.rotation.x = ', meh.rotation.x)
-                }
-            
-
-            function animateLeft() {
-                meh.rotation.x -= 0.01;
-                for (let i = 1; i < meh.children.length; i++) {
-                    meh.children[i].rotation.x += 0.01;
-                }
-            }
-            function animateRight() {
-                meh.rotation.x += 0.01;
-                for (let i = 1; i < meh.children.length; i++) {
-                    meh.children[i].rotation.x -= 0.01;
-                }
-            }
-
-            
-
-
-
+            });
         }
 
         // EVENT HANDLERS
@@ -402,26 +311,52 @@
         }
 
         //
-
+        function animateLeft() {
+            meh.rotation.x -= 0.01;
+            for (let i = 1; i < meh.children.length; i++) {
+                meh.children[i].rotation.x += 0.01;
+            }
+        }
+        function animateRight() {
+            meh.rotation.x += 0.01;
+            for (let i = 1; i < meh.children.length; i++) {
+                meh.children[i].rotation.x -= 0.01;
+            }
+        }
         function animate() {
-            
+            var momentum = 0;
+            for ( let i = 1; i < meh.children.length; i++) {
+                var force = 0;
+                for ( let j = 0; j < meh.children[i].children.length; j++) {
+                    force += meh.children[i].children[j].force
+                }
+                momentum += meh.children[i].position.z * force;
+            }
 
+            if (momentum == 0){
+                if (Math.abs(meh.rotation.x) < 0.05) {
+                    meh.rotation.x = 0;
+                    for (let i = 1; i < meh.children.length; i++) {
+                        meh.children[i].rotation.x = 0;
+                    }
+                } else if (meh.rotation.x < 0) {
+                    animateRight();
+                } else if (meh.rotation.x > 0) {
+                    animateLeft();
+                }
+            } else if (momentum < 0 && meh.rotation.x > -0.2) {
+                animateLeft();
+            } else if (momentum > 0 && meh.rotation.x < 0.2) {
+                animateRight();
+            }
             
             requestAnimationFrame( animate );
             controls.update(); //
             render();
-
         }
 
         function render() {
-            
-            
-            // group.rotation.z += 0.01;
-            // if (group.rotation.z > 0.3) {
-            //     group.rotation.z = 0.3;
-            // }
             renderer.render( scene, camera );
-
         }			
 
 
