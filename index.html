@@ -273,14 +273,14 @@
             
             
             eventControl.attachEvent( 'mouseUp', function () {
+                
+                this.event.object.parent.remove(this.event.object);
+                scene.add(this.event.object);
                 if ( this.event.object.position.y > -700 && this.event.object.position.x != 0) { 
-                    this.event.object.parent.remove(this.event.object);
-                    scene.add(this.event.object);
                     this.event.object.position.x = 0;
                     this.event.object.position.z = 300 + 200 * Math.round((this.event.object.position.z - 300) / 200);
                     for (let i = 1; i < meh.children.length; i++) {
                         if (this.event.object.position.z == meh.children[i].position.z) {
-                            
                             this.event.object.position.z = 0;
                             meh.children[i].add(this.event.object)
                         }
@@ -289,9 +289,12 @@
                         };
                     }
                 } else {
-                    this.event.object.parent.remove(this.event.object);
-                    scene.add(this.event.object);
                     this.event.object.position.copy( array_pos[ this.event.item ] ); 
+                    for (let i = 1; i < meh.children.length; i++) {
+                        for (let j = 0; j < meh.children[i].children.length; j++){
+                            meh.children[i].children[j].position.y = 30 - 180*j;
+                        };
+                    }
                 }
             });
         }
