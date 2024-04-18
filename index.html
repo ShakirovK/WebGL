@@ -4,9 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link type="text/css" rel="stylesheet" href="https://threejs.org/examples/main.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="container">
+        <div class="buttons">
+            <button id="theoryButton">Теория</button>
+            <button id="progressButton">Вычисления</button>
+            <button id="checkButton">Проверь себя</button>
+        </div>
+        <div id="progress" style="background-color: transparent; display: none;">
+            <table border="1" cellspacing="0" cellpadding="5">
+                <thead>
+                    <tr style="background-color: lightgray;">
+                        <th>l₁, м</th>
+                        <th>F₁, Н</th>
+                        <th>l₂, м</th>
+                        <th>F₂, Н</th>
+                        <th>M₁, Н·м</th>
+                        <th>M₂, Н·м</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr style="background-color: white;">
+                        <td id="l1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                        <td id="f1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                        <td id="l2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                        <td id="f2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                        <td id="m1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                        <td id="m2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
     
     <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 
@@ -21,13 +53,13 @@
     <script type="module">
 
         import * as THREE from 'three';
-        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        //import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { EventControls } from 'https://alexan0308.github.io/threejs/examples/js/controls/EventControls.js';
 
         var camera, scene, renderer;
         var controls, eventControl;
         var ambientLight, light;
-        var lever, box, cylinder, table, helperObject;
+        var box, cylinder, table, helperObject;
         const meh = new THREE.Group();
         const dragObjects = [];
         var array_pos = [];
@@ -42,7 +74,8 @@
 
             // CAMERA
             camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
-            camera.position.set( 10, 0, 0 );
+            camera.position.set( 0, 0, 0 );
+            camera.lookAt(-1, 0, 0);
 
             // LIGHTS
             ambientLight = new THREE.AmbientLight( 0x333333, 50 );	// 0.2
@@ -60,17 +93,17 @@
             // EVENTS
             window.addEventListener( 'resize', onWindowResize, false );
 
-            // CONTROLS
-            controls = new OrbitControls( camera, renderer.domElement );
-            controls.addEventListener( 'change', render );
-            //controls.rotateSpeed = 1; 
-            controls.enableZoom = true;  
-            controls.zoomSpeed = 0.5;  
+            // // CONTROLS
+            // controls = new OrbitControls( camera, renderer.domElement );
+            // controls.addEventListener( 'change', render );
+            // //controls.rotateSpeed = 1; 
+            // controls.enableZoom = true;  
+            // controls.zoomSpeed = 0.5;  
 
-            controls.minDistance = 500;
-            controls.maxDistance = 2500;
+            // controls.minDistance = 500;
+            // controls.maxDistance = 2500;
             
-            controls.enableDamping = true;
+            // controls.enableDamping = true;
 
             // scene itself
             scene = new THREE.Scene();
@@ -143,12 +176,19 @@
             scene.add(leverSupport);
 
             //рычаг
+            var lever = new THREE.Group();
             var leverGeometry = new THREE.BoxGeometry(30,80,2000);
             var leverMaterial = new THREE.MeshPhongMaterial({ color: 0x804030 });
-            var lever = new THREE.Mesh(leverGeometry, leverMaterial);
-            //lever.position.set(0, 200, 0);
-            
-            //scene.add(lever);
+            var ruler = new THREE.Mesh(leverGeometry, leverMaterial);
+            lever.add(ruler);
+            //засечки
+            for ( let z = -900; z <= 900; z += 200) {
+                var markGeometry = new THREE.BoxGeometry(30, 40, 5); 
+                var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 }); 
+                var mark = new THREE.Mesh(markGeometry, markMaterial);
+                mark.position.set(1, -20, z); 
+                lever.add(mark);
+            }
 
             //helperObject
             var helperObjectGeometry = new THREE.CylinderGeometry(10,10,32,10);
@@ -158,72 +198,234 @@
             helperObject.rotation.z = Math.PI / 2;
             scene.add(helperObject);
 
-
             
 
+              
+              
 
-            //груз1
-            var sinker = new THREE.Group();
+
+            //груз
+            var bigSinker = new THREE.Group();
+            bigSinker.force = 1;
             var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.BoxGeometry(10,200,10);
+            var markGeometry = new THREE.CylinderGeometry( 7, 7, 180, 10 );
             var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 65, 0);
-            var Geometry = new THREE.BoxGeometry(140,140,140);
-            var Material = new THREE.MeshPhongMaterial({ color: 0xC0C0C0 });
-            var obj = new THREE.Mesh(Geometry, Material);
-            sinker.add(obj);
-            sinker.add(mark);
-            sinker.position.set(-2000, -700, -500);
-            sinker.force = 10;
-            array_pos.push( new THREE.Vector3().copy( sinker.position ) );
-            scene.add(sinker);dragObjects.push( sinker );
+            mark.position.set(0, 80, 0);
+            var Geometry = new THREE.CylinderGeometry( 70, 70, 140, 20 );
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + bigSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            var obj = new THREE.Mesh(Geometry, materials);
+            bigSinker.add(obj);
+            bigSinker.add(mark);
+            bigSinker.position.set(-2200, -700, 200);
+            array_pos.push( new THREE.Vector3().copy( bigSinker.position ) );
+            scene.add(bigSinker);dragObjects.push( bigSinker );
             
 
+            //копия груза
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, 400);
+            copiedSinker.force = 1;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, 600);
+            copiedSinker.force = 2;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, 800);
+            copiedSinker.force = 3;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, 1000);
+            copiedSinker.force = 4;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, -200);
+            copiedSinker.force = 1;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, -400);
+            copiedSinker.force = 1;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, -600);
+            copiedSinker.force = 2;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
+
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, -800);
+            copiedSinker.force = 3;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
             
-            //груз2
-            var sinker2 = sinker.clone();
-            sinker2.position.set(-2000, -700, 500);
-            sinker2.force = 10;
-            array_pos.push( new THREE.Vector3().copy( sinker2.position ) );
-            scene.add(sinker2);dragObjects.push( sinker2 );
-
-
-            //груз3
-            var sinker3 = new THREE.Group();
-            var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.BoxGeometry(10,200,10);
-            var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 65, 0)
-            var Geometry = new THREE.BoxGeometry(70,70,70);
-            var Material = new THREE.MeshPhongMaterial({ color: 0xC0C0C0 });
-            var obj = new THREE.Mesh(Geometry, Material);;
-            sinker3.add(obj);
-            sinker3.add(mark);
-            sinker3.position.set(-2000, -735, 200);
-            sinker3.force = 5;
-            array_pos.push( new THREE.Vector3().copy( sinker3.position ) );
-            scene.add(sinker3);dragObjects.push( sinker3 );
-
-            //груз4
-            var sinker4 = sinker3.clone();
-            sinker4.position.set(-2000, -735, -200);
-            sinker4.force = 5;
-            array_pos.push( new THREE.Vector3().copy( sinker4.position ) );
-            scene.add(sinker4);dragObjects.push( sinker4 );
+            var copiedSinker = bigSinker.clone();
+            copiedSinker.position.set(-2200, -700, -1000);
+            copiedSinker.force = 4;
+            var materials = [ ];
+            var textureLoader = new THREE.TextureLoader();
+            for ( let i = 1; i <= 6; i++ ) {
+                if (i == 1) {
+                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set( 2, 1 );
+                } else {
+                    var texture = textureLoader.load( 'textures/steel.png' );
+                }
+                var material = new THREE.MeshPhongMaterial( { map: texture } );
+                materials.push( material );
+            }
+            copiedSinker.children[0].material = materials;
+            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            scene.add(copiedSinker);dragObjects.push( copiedSinker );
 
             
+
+
             //движущаяся часть
             meh.position.set(-2500, 200, 0);
             meh.add(lever);
             scene.add(meh);
-
-
-
             for (let i = -900; i <= 900; i += 200) {
                 const pos = new THREE.Group();
                 pos.name = i;  // Измените имя по своему усмотрению
                 pos.position.z = i;  // Rоордината z на основе счетчика цикла
-                pos.position.y = -200;
+                pos.position.y = -40;
                 pos.force = 0;
                 meh.add(pos);
             }
@@ -232,7 +434,7 @@
 
             //Рабочее поле вертикаольное
             var Material = new THREE.MeshPhongMaterial( { color: 0xD3D3D3, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
-            var Geometry = new THREE.PlaneGeometry( 2000, 1500, 1, 1 );
+            var Geometry = new THREE.PlaneGeometry( 3000, 1500, 1, 1 );
             var Board = new THREE.Group();
             var checkerboard = new THREE.Mesh( Geometry, Material );
             checkerboard.position.x = -2500;
@@ -241,7 +443,7 @@
             Board.add( checkerboard );
             //Рабочее поле горизонтальное
             var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0  } );
-            var Geometry2 = new THREE.PlaneGeometry( 800, 2000, 1, 1 );
+            var Geometry2 = new THREE.PlaneGeometry( 800, 3000, 1, 1 );
             var checkerboard2 = new THREE.Mesh( Geometry2, Material2 );
             checkerboard2.position.x = -2100;
             checkerboard2.position.y = -769;
@@ -250,12 +452,15 @@
 
 
 
+
+
+
             
             //Перемещение объектов
             eventControl = new EventControls( [ ... dragObjects ], camera, renderer.domElement );
             eventControl.setDraggable( render, true );              
             eventControl.setMap ( Board );
-            eventControl.setOrbitControl( controls );          
+            //eventControl.setOrbitControl( controls );          
             eventControl.attachEvent( 'dragAndDrop', function () {
                 this.event.object.parent.remove(this.event.object);
                 scene.add(this.event.object);
@@ -285,17 +490,18 @@
                             meh.children[i].add(this.event.object)
                         }
                         for (let j = 0; j < meh.children[i].children.length; j++){
-                            meh.children[i].children[j].position.y = 30 - 180*j;
+                            meh.children[i].children[j].position.y = -160 - 180*j;
                         };
                     }
                 } else {
                     this.event.object.position.copy( array_pos[ this.event.item ] ); 
                     for (let i = 1; i < meh.children.length; i++) {
                         for (let j = 0; j < meh.children[i].children.length; j++){
-                            meh.children[i].children[j].position.y = 30 - 180*j;
+                            meh.children[i].children[j].position.y = -160 - 180*j;
                         };
                     }
                 }
+                moment(meh, this.event.object);
             });
         }
 
@@ -354,14 +560,106 @@
             }
             
             requestAnimationFrame( animate );
-            controls.update(); //
+            //controls.update(); //
             render();
         }
 
         function render() {
             renderer.render( scene, camera );
         }			
+        
+        const progressButton = document.getElementById('progressButton');
+        progressButton.addEventListener("click", function() {
+            if (document.getElementById('progress').style.display == 'none') {
+                close();
+                workProgress();
+            } else {
+                close();
+            }
+        });
+        function workProgress() {
+            document.getElementById('progress').style.display = '';
+        }
 
+        
+        const theoryButton = document.getElementById("theoryButton");
+        theoryButton.addEventListener("click", function() {
+            if (!document.getElementById('theory')) {
+                close();
+                openTheory();
+            } else {
+                close();
+            }
+        });
+
+        function close() {
+            if (document.getElementById('theory')) document.getElementById('theory').remove();
+            if (document.getElementById('progress').style.display == '') document.getElementById('progress').style.display = 'none';;
+        }
+
+        function openTheory() {
+            // Создаем div-элемент
+            var container = document.querySelector('.container');
+            var theory = document.createElement('div');
+            theory.className = 'theory';
+            theory.id = 'theory';
+            theory.innerHTML = `
+                <div class="content">
+                    <section class="definition">
+                        <h2>Плечо силы</h2>
+                        <p>Плечом силы называется расстояние от точки опоры до линии действия силы.</p>
+                        <p class="designation">Обозначение: <span class="formula">l</span></p> 
+                        <p class="designation">Единица измерения в СИ: <span class="formula">м</span></p> 
+                    </section>
+                    <section class="definition">
+                        <h2>Момент силы</h2>
+                        <p>Моментом силы называется произведение величины этой силы на ее плечо.</p>
+                        <p class="designation">Обозначение: <span class="formula">M</span></p> 
+                        <p class="designation">Единица измерения в СИ: <span class="formula">Н·м</span></p> 
+                    </section>
+                </div>
+                <section class="rule">
+                    <h2>Правило моментов</h2>
+                    <p>Рычаг находится в положении равновесия, если момент силы, вращающей его по часовой стрелке, равен моменту силы, вращающей его против часовой стрелки.</p>
+                    <p><span class="formula">M₁ = M₂</span></p>
+                    <p><span class="formula">F₁l₁ = F₂l₂</span></p>
+                </section>
+            `;
+            container.appendChild(theory);
+            }
+
+            function moment(meh) {
+                var l1 = [];
+                var l2 = [];
+                var f1 = document.getElementById('f1');
+                var f2 = document.getElementById('f2');
+                l1.innerText = l2.innerText = f1.innerText = f2.innerText = '';
+                for (let i=1; i < meh.children.length; i++) {
+                    if (meh.children[i].children.length && meh.children[i].position.z > 0) {
+                        for (let j = 0; j < meh.children[i].children.length; j++) {
+                            f1.innerText = Number(meh.children[i].children[j].force) + Number(f1.innerText);
+                        }
+                        l1.push(Number(meh.children[i].position.z) / 2000 );
+                    } else if (meh.children[i].children.length && meh.children[i].position.z < 0) {
+                        for (let j = 0; j < meh.children[i].children.length; j++) {
+                            f2.innerText = Number(meh.children[i].children[j].force) + Number(f2.innerText);
+                        }
+                        l2.push(Number(meh.children[i].position.z) / 2000 );
+                    }
+                }  
+                var sum1 = 0;
+                for (let i=0; i < l1.length; i++) {
+                    sum1 += l1[i];
+                }
+                document.getElementById('l1').innerText = sum1 / l1.length || '';
+                var sum2 = 0;
+                for (let i=0; i < l2.length; i++) {
+                    sum2 += l2[i];
+                }
+                document.getElementById('l2').innerText = (-1)*sum2 / l2.length || '';
+                document.getElementById('m1').innerText = f1.innerText * document.getElementById('l1').innerText || '';
+                document.getElementById('m2').innerText = f2.innerText * document.getElementById('l2').innerText || '';
+            }
 
     </script>
 </body>
