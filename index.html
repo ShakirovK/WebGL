@@ -11,30 +11,7 @@
         <div class="buttons">
             <button id="theoryButton">Теория</button>
             <button id="progressButton">Вычисления</button>
-        </div>
-        <div id="progress" style="background-color: transparent; display: none;">
-            <table border="1" cellspacing="0" cellpadding="5">
-                <thead>
-                    <tr style="background-color: lightgray;">
-                        <th>l₁, м</th>
-                        <th>F₁, Н</th>
-                        <th>l₂, м</th>
-                        <th>F₂, Н</th>
-                        <th>M₁, Н·м</th>
-                        <th>M₂, Н·м</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr style="background-color: white;">
-                        <td id="l1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                        <td id="f1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                        <td id="l2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                        <td id="f2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                        <td id="m1" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                        <td id="m2" style="border: 1px solid black; width: 80px; height: 30px;"></td>
-                    </tr>
-                </tbody>
-            </table>
+            <button id="randomButton">Уравнять</button>
         </div>
     </div>
     
@@ -62,6 +39,7 @@
         const meh = new THREE.Group();
         const dragObjects = [];
         var array_pos = [];
+        var obj = [];
         
         init();
         animate();
@@ -224,17 +202,18 @@
                 var material = new THREE.MeshPhongMaterial( { map: texture } );
                 materials.push( material );
             }
-            var obj = new THREE.Mesh(Geometry, materials);
-            bigSinker.add(obj);
+            var sinker = new THREE.Mesh(Geometry, materials);
+            bigSinker.add(sinker);
             bigSinker.add(mark);
-            bigSinker.position.set(-2200, -700, 200);
+            bigSinker.position.set(-2200, -700, 1000);
             array_pos.push( new THREE.Vector3().copy( bigSinker.position ) );
             scene.add(bigSinker);dragObjects.push( bigSinker );
+            obj.push(bigSinker);
             
 
             //копия груза
             var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 400);
+            copiedSinker.position.set(-2200, -700, 800);
             copiedSinker.force = 1;
             var materials = [ ];
             var textureLoader = new THREE.TextureLoader();
@@ -252,6 +231,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, 600);
@@ -272,9 +252,10 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 800);
+            copiedSinker.position.set(-2200, -700, 400);
             copiedSinker.force = 3;
             var materials = [ ];
             var textureLoader = new THREE.TextureLoader();
@@ -292,9 +273,10 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 1000);
+            copiedSinker.position.set(-2200, -700, 200);
             copiedSinker.force = 4;
             var materials = [ ];
             var textureLoader = new THREE.TextureLoader();
@@ -312,6 +294,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, -200);
@@ -332,6 +315,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, -400);
@@ -352,6 +336,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, -600);
@@ -372,6 +357,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, -800);
@@ -392,6 +378,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
             
             var copiedSinker = bigSinker.clone();
             copiedSinker.position.set(-2200, -700, -1000);
@@ -412,6 +399,7 @@
             copiedSinker.children[0].material = materials;
             array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
             scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            obj.push(copiedSinker);
 
             
 
@@ -441,7 +429,7 @@
             checkerboard.rotation.y =  Math.PI / 2;
             Board.add( checkerboard );
             //Рабочее поле горизонтальное
-            var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0  } );
+            var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
             var Geometry2 = new THREE.PlaneGeometry( 800, 3000, 1, 1 );
             var checkerboard2 = new THREE.Mesh( Geometry2, Material2 );
             checkerboard2.position.x = -2100;
@@ -449,7 +437,7 @@
             checkerboard2.rotation.x =  Math.PI / 2;
             Board.add( checkerboard2 ); scene.add( Board );
 
-
+            
 
 
 
@@ -465,9 +453,6 @@
                 scene.add(this.event.object);
                 this.event.object.position.z = Math.max(-999, Math.min(999, this.event.object.position.z));
                 this.event.object.position.y = Math.max(-700, Math.min(200, this.event.object.position.y));
-                // if (this.event.object.position.y > -500 ) {
-                //     this.event.object.position.x = -2500;
-                // } 
             }); 
 
 
@@ -477,30 +462,29 @@
             
             
             eventControl.attachEvent( 'mouseUp', function () {
-                
                 this.event.object.parent.remove(this.event.object);
                 scene.add(this.event.object);
-                if ( this.event.object.position.y > -700 && this.event.object.position.x != 0) { 
-                    this.event.object.position.x = 0;
-                    this.event.object.position.z = 300 + 200 * Math.round((this.event.object.position.z - 300) / 200);
-                    for (let i = 1; i < meh.children.length; i++) {
-                        if (this.event.object.position.z == meh.children[i].position.z) {
-                            this.event.object.position.z = 0;
-                            meh.children[i].add(this.event.object)
-                        }
-                        for (let j = 0; j < meh.children[i].children.length; j++){
-                            meh.children[i].children[j].position.y = -160 - 180*j;
-                        };
-                    }
+                this.event.object.position.z = 300 + 200 * Math.round((this.event.object.position.z - 300) / 200);
+                let key = false;
+                for ( let i = 1; i < meh.children.length; i++ ) {
+                    if (meh.children[i].position.z == this.event.object.position.z && meh.children[i].children.length < 4) {
+                        key = true;
+                    } 
+                }
+                if ( this.event.object.position.y > -700 && this.event.object.position.x != 0 && key ) { 
+                    addObject(this.event.object)
                 } else {
                     this.event.object.position.copy( array_pos[ this.event.item ] ); 
                     for (let i = 1; i < meh.children.length; i++) {
                         for (let j = 0; j < meh.children[i].children.length; j++){
-                            meh.children[i].children[j].position.y = -160 - 180*j;
+                            meh.children[i].children[j].position.y = -120 - 180*j;
                         };
                     }
                 }
-                moment(meh, this.event.object);
+                if (document.getElementById('progress')) {
+                    close();
+                    workProgress();
+                }
             });
         }
 
@@ -518,7 +502,7 @@
 
         }
 
-        //
+        
         function animateLeft() {
             meh.rotation.x -= 0.01;
             for (let i = 1; i < meh.children.length; i++) {
@@ -567,20 +551,18 @@
             renderer.render( scene, camera );
         }			
         
+        // Кнопка Вычислеения
         const progressButton = document.getElementById('progressButton');
         progressButton.addEventListener("click", function() {
-            if (document.getElementById('progress').style.display == 'none') {
+            if (!document.getElementById('progress')) {
                 close();
                 workProgress();
             } else {
                 close();
             }
         });
-        function workProgress() {
-            document.getElementById('progress').style.display = '';
-        }
-
         
+        // Кнопка Теория
         const theoryButton = document.getElementById("theoryButton");
         theoryButton.addEventListener("click", function() {
             if (!document.getElementById('theory')) {
@@ -591,9 +573,15 @@
             }
         });
 
+        // Кнопка уравнять
+        const randomButton = document.getElementById("randomButton");
+        randomButton.addEventListener("click", function() {
+            equalize();
+        });
+
         function close() {
             if (document.getElementById('theory')) document.getElementById('theory').remove();
-            if (document.getElementById('progress').style.display == '') document.getElementById('progress').style.display = 'none';;
+            if (document.getElementById('progress')) document.getElementById('progress').remove();
         }
 
         function openTheory() {
@@ -625,40 +613,213 @@
                 </section>
             `;
             container.appendChild(theory);
-            }
+        }
 
-            function moment(meh) {
-                var l1 = [];
-                var l2 = [];
-                var f1 = document.getElementById('f1');
-                var f2 = document.getElementById('f2');
-                l1.innerText = l2.innerText = f1.innerText = f2.innerText = '';
-                for (let i=1; i < meh.children.length; i++) {
-                    if (meh.children[i].children.length && meh.children[i].position.z > 0) {
-                        for (let j = 0; j < meh.children[i].children.length; j++) {
-                            f1.innerText = Number(meh.children[i].children[j].force) + Number(f1.innerText);
-                        }
-                        l1.push(Number(meh.children[i].position.z) / 2000 );
-                    } else if (meh.children[i].children.length && meh.children[i].position.z < 0) {
-                        for (let j = 0; j < meh.children[i].children.length; j++) {
-                            f2.innerText = Number(meh.children[i].children[j].force) + Number(f2.innerText);
-                        }
-                        l2.push(Number(meh.children[i].position.z) / 2000 );
-                    }
-                }  
-                var sum1 = 0;
-                for (let i=0; i < l1.length; i++) {
-                    sum1 += l1[i];
-                }
-                document.getElementById('l1').innerText = sum1 / l1.length || '';
-                var sum2 = 0;
-                for (let i=0; i < l2.length; i++) {
-                    sum2 += l2[i];
-                }
-                document.getElementById('l2').innerText = (-1)*sum2 / l2.length || '';
-                document.getElementById('m1').innerText = f1.innerText * document.getElementById('l1').innerText || '';
-                document.getElementById('m2').innerText = f2.innerText * document.getElementById('l2').innerText || '';
+        function workProgress() {
+            var container = document.querySelector('.container');
+            var progress = document.createElement('div');
+            progress.id = 'progress';
+
+            // Создаем таблицу
+            var table = document.createElement('table');
+            table.setAttribute('cellspacing', '0');
+            table.setAttribute('cellpadding', '5');
+
+            // Создаем заголовок таблицы
+            var thead = document.createElement('thead');
+            var headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = 'lightgray';
+            var headers = ['№ позиции', 'F, Н', 'l, м', 'M, Н·м'];
+            headers.forEach(function(headerText) {
+                var th = document.createElement('th');
+                th.style.border = '1px solid black';
+                th.style.width = '80px';
+                th.style.height = '30px';
+                th.textContent = headerText;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            // Создаем тело таблицы
+            var tbody = document.createElement('tbody');
+            var m = moment().reverse();
+            var f = forces().reverse();
+            var l = lengths().reverse();
+            var results = [];
+            for (let i = 0; i < m.length; i++) {
+                results.push(i+1, m[i], f[i], l[i]);
             }
+            for (let i = 0; i < m.length; i++) {
+                if (m[i]!=0) {
+                    var bodyRow = document.createElement('tr');
+                    bodyRow.style.backgroundColor = 'white';
+                    var ids = ['num','F', 'l', 'm'];
+                    for (let j = 0; j < ids.length; j++) {
+                        var td = document.createElement('td');
+                        td.setAttribute('id', ids[j] + i);
+                        td.style.border = '1px solid black';
+                        td.style.width = '80px';
+                        td.style.height = '30px';
+                        if (j == 0) {
+                            td.innerHTML = i+1;
+                        } if (j == 1) {
+                            td.innerHTML = f[i];
+                        } if (j == 2) {
+                            if (l[i] < 0) {
+                                td.innerHTML = (-1) * l[i];
+                            } else {
+                                td.innerHTML = l[i];
+                            }
+                        } if (j == 3) {
+                            if (m[i] < 0) {
+                                td.innerHTML = (-1) * m[i];
+                            } else {
+                                td.innerHTML = m[i];
+                            }
+                        }
+                        bodyRow.appendChild(td);
+                    }
+                    if (i < 5 && !leftM) {
+                        var td = document.createElement('td');
+                        td.setAttribute('id', 'leftM');
+                        td.style.border = '1px solid black';
+                        td.style.width = '80px';
+                        td.style.height = '30px';
+                        var leftM = m.slice(0,5);
+                        var sum = 0;
+                        for (let j = 0; j < leftM.length; j++) {
+                            sum += Number(leftM[j]);
+                        }
+                        td.innerHTML = 'Момент силы слева\n' + sum.toFixed(2);
+                        bodyRow.appendChild(td);
+                    }
+                    if (i >= 5 && !rightM) {
+                        var td = document.createElement('td');
+                        td.setAttribute('id', 'rightM');
+                        td.style.border = '1px solid black';
+                        td.style.width = '80px';
+                        td.style.height = '30px';
+                        var rightM = m.slice(5,10);
+                        var sum = 0;
+                        for (let j = 0; j < rightM.length; j++) {
+                            sum += (-1) * Number(rightM[j]);
+                        }
+                        td.innerHTML = 'Момент силы справа\n' + sum.toFixed(2);
+                        bodyRow.appendChild(td);
+                    }
+                    tbody.appendChild(bodyRow);
+                }
+                
+                
+            }
+            table.appendChild(tbody);
+            progress.appendChild(table);
+            container.appendChild(progress);
+        }
+
+        function moment() {
+            var m = [];
+            for (let i = 1; i < meh.children.length; i++) {
+                var force = 0;
+                for ( let j = 0; j < meh.children[i].children.length; j++) {
+                    force += meh.children[i].children[j].force;
+                }
+                m.push(((meh.children[i].position.z / 2000) * force).toFixed(2));
+            }
+            return(m);
+        }
+        function forces() {
+            var f = [];
+            for (let i = 1; i < meh.children.length; i++) {
+                var force = 0;
+                for ( let j = 0; j < meh.children[i].children.length; j++) {
+                    force += meh.children[i].children[j].force;
+                }
+                f.push(force.toFixed(2));
+            }
+            return(f);
+        }
+        function lengths() {
+            var l = [];
+            for (let i = 1; i < meh.children.length; i++) {
+                l.push((meh.children[i].position.z / 2000).toFixed(2));
+            }
+            return(l);
+        }
+
+
+        function equalize() {
+            var m = moment();
+            var sum = 0;
+            for (let i = 0; i < m.length; i++){
+                sum += Number(m[i])
+            }
+            sum = Number(sum.toFixed(2));
+            if (sum != 0) {
+                var key = true;
+                for ( let i = 0; i < obj.length; i++ ) {
+                    if (obj[i].position.x != 0 && key) {
+                        for (let j = 1; j < meh.children.length; j++){
+                            var elem = Number((obj[i].force * (meh.children[j].position.z / 2000 )).toFixed(2))
+                            if (sum + elem == 0 && meh.children[j].children.length < 4) {
+                                obj[i].position.z = meh.children[j].position.z;
+                                addObject(obj[i]);
+                                key = false;
+                                break;
+                            }
+                        }
+                    } 
+                    if (!key) {
+                        break
+                    }
+                }
+                if (key) {
+                    notification('Нельзя уравнять путем добавления одного груза')
+                }
+            }
+        }
+
+        function addObject(object) {
+            object.position.x = 0;
+            object.position.z = 300 + 200 * Math.round((object.position.z - 300) / 200);
+            for (let i = 1; i < meh.children.length; i++) {
+                if (object.position.z == meh.children[i].position.z) {
+                    object.position.z = 0;
+                    meh.children[i].add(object)
+                }
+                for (let j = 0; j < meh.children[i].children.length; j++){
+                    meh.children[i].children[j].position.y = -120 - 180*j;
+                }
+            }
+            
+        }
+
+        function notification(message) {
+            if (!document.getElementById('notification')) {
+                var notification = document.createElement('div');
+                notification.id = 'notification';
+                notification.textContent = message;
+                notification.style.position = 'fixed';
+                notification.style.top = '15%'; // Расположение сверху экрана
+                notification.style.left = '50%';
+                notification.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
+                notification.style.color = 'red'; // Красный цвет текста
+                notification.style.zIndex = '9999';
+                notification.style.transition = 'opacity 1.5s ease-out'; // Плавное исчезновение
+                notification.style.userSelect = 'none';
+                notification.style.fontSize = '20px';
+                // Добавляем уведомление на страницу
+                document.body.appendChild(notification);
+                // Устанавливаем таймер для удаления уведомления через некоторое время
+                setTimeout(function() {
+                    notification.style.opacity = '0'; // Устанавливаем прозрачность на 0 для плавного исчезновения
+                    setTimeout(function() {
+                        document.getElementById('notification').remove(); // Удаляем уведомление после завершения анимации
+                    }, 1500); // Ждем 1.5 секунды (время анимации)
+                }, 1000);
+            }
+        }
 
     </script>
 </body>
