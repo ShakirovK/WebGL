@@ -176,230 +176,273 @@
             scene.add(helperObject);
 
             
+            //грузы
+            var createSinker = function(force, x, y, z) {
+            var sinkerGroup = new THREE.Group();
+            sinkerGroup.force = force;
 
-              
+            var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+            var markGeometry = new THREE.CylinderGeometry(7, 7, 180, 10);
+            var mark = new THREE.Mesh(markGeometry, markMaterial);
+            mark.position.set(0, 80, 0);
+
+            var Geometry = new THREE.CylinderGeometry(70, 70, 140, 20);
+            var materials = [];
+            var textureLoader = new THREE.TextureLoader();
+            for (let i = 1; i <= 6; i++) {
+                if (i == 1) {
+                    var texture = textureLoader.load('textures/' + force + 'H.png');
+                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set(2, 1);
+                } else {
+                    var texture = textureLoader.load('textures/steel.png');
+                }
+                var material = new THREE.MeshPhongMaterial({ map: texture });
+                materials.push(material);
+            }
+            var sinker = new THREE.Mesh(Geometry, materials);
+            sinkerGroup.add(sinker);
+            sinkerGroup.add(mark);
+            sinkerGroup.position.set(x, y, z);
+            array_pos.push( new THREE.Vector3().copy(sinkerGroup.position));
+            scene.add(sinkerGroup);dragObjects.push(sinkerGroup);
+            obj.push(sinkerGroup);
+            return sinkerGroup;
+            };
+
+            var bigSinker = createSinker(1, -2200, -700, 1000);
+            var copiedSinker1 = createSinker(1, -2200, -700, 800);
+            var copiedSinker2 = createSinker(2, -2200, -700, 600);
+            var copiedSinker3 = createSinker(3, -2200, -700, 400);
+            var copiedSinker4 = createSinker(4, -2200, -700, 200);
+            var copiedSinker5 = createSinker(1, -2200, -700, -200);
+            var copiedSinker6 = createSinker(1, -2200, -700, -400);
+            var copiedSinker7 = createSinker(2, -2200, -700, -600);
+            var copiedSinker8 = createSinker(3, -2200, -700, -800);
+            var copiedSinker9 = createSinker(4, -2200, -700, -1000);
+
               
 
 
             //груз
-            var bigSinker = new THREE.Group();
-            bigSinker.force = 1;
-            var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.CylinderGeometry( 7, 7, 180, 10 );
-            var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 80, 0);
-            var Geometry = new THREE.CylinderGeometry( 70, 70, 140, 20 );
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + bigSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            var sinker = new THREE.Mesh(Geometry, materials);
-            bigSinker.add(sinker);
-            bigSinker.add(mark);
-            bigSinker.position.set(-2200, -700, 1000);
-            array_pos.push( new THREE.Vector3().copy( bigSinker.position ) );
-            scene.add(bigSinker);dragObjects.push( bigSinker );
-            obj.push(bigSinker);
+            // var bigSinker = new THREE.Group();
+            // bigSinker.force = 1;
+            // var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+            // var markGeometry = new THREE.CylinderGeometry( 7, 7, 180, 10 );
+            // var mark = new THREE.Mesh(markGeometry, markMaterial);
+            // mark.position.set(0, 80, 0);
+            // var Geometry = new THREE.CylinderGeometry( 70, 70, 140, 20 );
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + bigSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // var sinker = new THREE.Mesh(Geometry, materials);
+            // bigSinker.add(sinker);
+            // bigSinker.add(mark);
+            // bigSinker.position.set(-2200, -700, 1000);
+            // array_pos.push( new THREE.Vector3().copy( bigSinker.position ) );
+            // scene.add(bigSinker);dragObjects.push( bigSinker );
+            // obj.push(bigSinker);
             
 
-            //копия груза
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 800);
-            copiedSinker.force = 1;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // //копия груза
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, 800);
+            // copiedSinker.force = 1;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 600);
-            copiedSinker.force = 2;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, 600);
+            // copiedSinker.force = 2;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 400);
-            copiedSinker.force = 3;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, 400);
+            // copiedSinker.force = 3;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, 200);
-            copiedSinker.force = 4;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, 200);
+            // copiedSinker.force = 4;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, -200);
-            copiedSinker.force = 1;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, -200);
+            // copiedSinker.force = 1;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, -400);
-            copiedSinker.force = 1;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, -400);
+            // copiedSinker.force = 1;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, -600);
-            copiedSinker.force = 2;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, -600);
+            // copiedSinker.force = 2;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, -800);
-            copiedSinker.force = 3;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, -800);
+            // copiedSinker.force = 3;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
             
-            var copiedSinker = bigSinker.clone();
-            copiedSinker.position.set(-2200, -700, -1000);
-            copiedSinker.force = 4;
-            var materials = [ ];
-            var textureLoader = new THREE.TextureLoader();
-            for ( let i = 1; i <= 6; i++ ) {
-                if (i == 1) {
-                    var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set( 2, 1 );
-                } else {
-                    var texture = textureLoader.load( 'textures/steel.png' );
-                }
-                var material = new THREE.MeshPhongMaterial( { map: texture } );
-                materials.push( material );
-            }
-            copiedSinker.children[0].material = materials;
-            array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            obj.push(copiedSinker);
+            // var copiedSinker = bigSinker.clone();
+            // copiedSinker.position.set(-2200, -700, -1000);
+            // copiedSinker.force = 4;
+            // var materials = [ ];
+            // var textureLoader = new THREE.TextureLoader();
+            // for ( let i = 1; i <= 6; i++ ) {
+            //     if (i == 1) {
+            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
+            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            //         texture.repeat.set( 2, 1 );
+            //     } else {
+            //         var texture = textureLoader.load( 'textures/steel.png' );
+            //     }
+            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
+            //     materials.push( material );
+            // }
+            // copiedSinker.children[0].material = materials;
+            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
+            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
+            // obj.push(copiedSinker);
 
             
 
@@ -777,6 +820,10 @@
                 if (key) {
                     notification('Нельзя уравнять путем добавления одного груза')
                 }
+            }
+            if (document.getElementById('progress')) {
+                close();
+                workProgress();
             }
         }
 
