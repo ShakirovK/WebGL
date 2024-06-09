@@ -3,16 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>WebGL</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <div class="buttons">
-            <button id="theoryButton">Теория</button>
-            <button id="progressButton">Вычисления</button>
-            <button id="randomButton">Уравнять</button>
-        </div>
+    <div class="sidebar">
+        <div id="theoryButton" class="menu-buttons">Теория</div>
+        <div id="progressButton" class="menu-buttons">Вычисления</div>
+        <div id="randomButton" class="menu-buttons">Уравнять</div>
+        <div id="taskButton" class="menu-buttons">Задания</div>
+        <div id="task1Button" class="task-buttons" style="display: none;">Задание 1</div>
+        <div id="task2Button" class="task-buttons" style="display: none;">Задание 2</div>
+        <div id="task3Button" class="task-buttons" style="display: none;">Задание 3</div>
+        <div id="backButton" class="task-buttons" style="display: none;">Назад</div>
+    </div>
+    <div class="main-content">
+
     </div>
     
     
@@ -29,7 +35,7 @@
     <script type="module">
 
         import * as THREE from 'three';
-        //import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { EventControls } from 'https://alexan0308.github.io/threejs/examples/js/controls/EventControls.js';
 
         var camera, scene, renderer;
@@ -37,50 +43,65 @@
         var ambientLight, light;
         var box, cylinder, table, helperObject;
         const meh = new THREE.Group();
-        const dragObjects = [];
+        var dragObjects = [];
         var array_pos = [];
         var obj = [];
+        var task1BoardCherker = false;
+        var task2BoardCherker = false;
+        var Board = new THREE.Group();
         
         init();
         animate();
+        window.onload = function() { render(); }
 
         function init() {
-
-            var container = document.createElement( 'div' );
-            document.body.appendChild( container );
+            var main = document.querySelector('.main-content');
+            var container = document.createElement('div');
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.position = 'relative';
+            main.appendChild(container);
 
             // CAMERA
             camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 80000 );
-            camera.position.set( 0, 0, 0 );
-            camera.lookAt(-1, 0, 0);
+            camera.position.set( 500, 0, 0 );
+            camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            // camera.lookAt(-1, 0, 0);
 
             // LIGHTS
-            ambientLight = new THREE.AmbientLight( 0x333333, 50 );	// 0.2
+            ambientLight = new THREE.AmbientLight( 0xffffff);
 
             light = new THREE.DirectionalLight( 0xFFFFFF, 1.0 );
-            light.position.set( 1, 1, 1 );				
+            light.position.set( 1, 1, -1 );				
             // direction is set in GUI
 
             // RENDERER
             renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setPixelRatio( window.devicePixelRatio );
-            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.setSize(container.clientWidth, container.clientHeight);
             container.appendChild( renderer.domElement );
 
             // EVENTS
             window.addEventListener( 'resize', onWindowResize, false );
 
-            // // CONTROLS
-            // controls = new OrbitControls( camera, renderer.domElement );
-            // controls.addEventListener( 'change', render );
-            // //controls.rotateSpeed = 1; 
-            // controls.enableZoom = true;  
-            // controls.zoomSpeed = 0.5;  
+            // CONTROLS
+            controls = new OrbitControls( camera, renderer.domElement );
+            controls.addEventListener( 'change', render );
+            controls.rotateSpeed = 0.1; 
 
-            // controls.minDistance = 500;
-            // controls.maxDistance = 2500;
+            controls.enableZoom = true;  
+            controls.zoomSpeed = 0.5;  
+            controls.minDistance = 500;
+            controls.maxDistance = 2500;
+
+            controls.minPolarAngle = Math.PI/2 - Math.PI/20;
+            controls.maxPolarAngle = Math.PI/2 + Math.PI/20;
+            controls.minAzimuthAngle = Math.PI/2 - Math.PI/12;
+            controls.maxAzimuthAngle = Math.PI/2 + Math.PI/12;
             
-            // controls.enableDamping = true;
+            //controls.enableDamping = true;
 
             // scene itself
             scene = new THREE.Scene();
@@ -89,7 +110,7 @@
             scene.add( ambientLight );
             scene.add( light );
 
-
+            // комната
             var materials = [ ];
             var textureLoader = new THREE.TextureLoader();
             for ( let i = 1; i <= 6; i++ ) {
@@ -178,36 +199,37 @@
             
             //грузы
             var createSinker = function(force, x, y, z) {
-            var sinkerGroup = new THREE.Group();
-            sinkerGroup.force = force;
+                var sinkerGroup = new THREE.Group();
+                sinkerGroup.force = force;
 
-            var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            var markGeometry = new THREE.CylinderGeometry(7, 7, 180, 10);
-            var mark = new THREE.Mesh(markGeometry, markMaterial);
-            mark.position.set(0, 80, 0);
+                var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
+                var markGeometry = new THREE.CylinderGeometry(7, 7, 180, 10);
+                var mark = new THREE.Mesh(markGeometry, markMaterial);
+                mark.position.set(0, 80, 0);
 
-            var Geometry = new THREE.CylinderGeometry(70, 70, 140, 20);
-            var materials = [];
-            var textureLoader = new THREE.TextureLoader();
-            for (let i = 1; i <= 6; i++) {
-                if (i == 1) {
-                    var texture = textureLoader.load('textures/' + force + 'H.png');
-                    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-                    texture.repeat.set(2, 1);
-                } else {
-                    var texture = textureLoader.load('textures/steel.png');
+                var Geometry = new THREE.CylinderGeometry(70, 70, 140, 20);
+                var materials = [];
+                var textureLoader = new THREE.TextureLoader();
+                for (let i = 1; i <= 6; i++) {
+                    if (i == 1) {
+                        var texture = textureLoader.load('textures/' + force + 'H.png');
+                        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+                        texture.repeat.set(2, 1);
+                    } else {
+                        var texture = textureLoader.load('textures/steel.png');
+                    }
+                    var material = new THREE.MeshPhongMaterial({ map: texture });
+                    materials.push(material);
                 }
-                var material = new THREE.MeshPhongMaterial({ map: texture });
-                materials.push(material);
-            }
-            var sinker = new THREE.Mesh(Geometry, materials);
-            sinkerGroup.add(sinker);
-            sinkerGroup.add(mark);
-            sinkerGroup.position.set(x, y, z);
-            array_pos.push( new THREE.Vector3().copy(sinkerGroup.position));
-            scene.add(sinkerGroup);dragObjects.push(sinkerGroup);
-            obj.push(sinkerGroup);
-            return sinkerGroup;
+                var sinker = new THREE.Mesh(Geometry, materials);
+                sinkerGroup.add(sinker);
+                sinkerGroup.add(mark);
+                sinkerGroup.position.set(x, y, z);
+                array_pos.push( new THREE.Vector3().copy(sinkerGroup.position));
+                scene.add(sinkerGroup);
+                // dragObjects.push(sinkerGroup);
+                obj.push(sinkerGroup);
+                return sinkerGroup;
             };
 
             var bigSinker = createSinker(1, -2200, -700, 1000);
@@ -220,231 +242,7 @@
             var copiedSinker7 = createSinker(2, -2200, -700, -600);
             var copiedSinker8 = createSinker(3, -2200, -700, -800);
             var copiedSinker9 = createSinker(4, -2200, -700, -1000);
-
-              
-
-
-            //груз
-            // var bigSinker = new THREE.Group();
-            // bigSinker.force = 1;
-            // var markMaterial = new THREE.MeshPhongMaterial({ color: 0x000000 });
-            // var markGeometry = new THREE.CylinderGeometry( 7, 7, 180, 10 );
-            // var mark = new THREE.Mesh(markGeometry, markMaterial);
-            // mark.position.set(0, 80, 0);
-            // var Geometry = new THREE.CylinderGeometry( 70, 70, 140, 20 );
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + bigSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // var sinker = new THREE.Mesh(Geometry, materials);
-            // bigSinker.add(sinker);
-            // bigSinker.add(mark);
-            // bigSinker.position.set(-2200, -700, 1000);
-            // array_pos.push( new THREE.Vector3().copy( bigSinker.position ) );
-            // scene.add(bigSinker);dragObjects.push( bigSinker );
-            // obj.push(bigSinker);
-            
-
-            // //копия груза
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, 800);
-            // copiedSinker.force = 1;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, 600);
-            // copiedSinker.force = 2;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, 400);
-            // copiedSinker.force = 3;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, 200);
-            // copiedSinker.force = 4;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, -200);
-            // copiedSinker.force = 1;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, -400);
-            // copiedSinker.force = 1;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, -600);
-            // copiedSinker.force = 2;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, -800);
-            // copiedSinker.force = 3;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-            
-            // var copiedSinker = bigSinker.clone();
-            // copiedSinker.position.set(-2200, -700, -1000);
-            // copiedSinker.force = 4;
-            // var materials = [ ];
-            // var textureLoader = new THREE.TextureLoader();
-            // for ( let i = 1; i <= 6; i++ ) {
-            //     if (i == 1) {
-            //         var texture = textureLoader.load( 'textures/' + copiedSinker.force + 'H.png' );
-            //         texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-            //         texture.repeat.set( 2, 1 );
-            //     } else {
-            //         var texture = textureLoader.load( 'textures/steel.png' );
-            //     }
-            //     var material = new THREE.MeshPhongMaterial( { map: texture } );
-            //     materials.push( material );
-            // }
-            // copiedSinker.children[0].material = materials;
-            // array_pos.push( new THREE.Vector3().copy( copiedSinker.position ) );
-            // scene.add(copiedSinker);dragObjects.push( copiedSinker );
-            // obj.push(copiedSinker);
-
-            
+            dragObjects.push(...obj);
 
 
             //движущаяся часть
@@ -464,8 +262,8 @@
 
             //Рабочее поле вертикаольное
             var Material = new THREE.MeshPhongMaterial( { color: 0xD3D3D3, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
-            var Geometry = new THREE.PlaneGeometry( 3000, 1500, 1, 1 );
-            var Board = new THREE.Group();
+            var Geometry = new THREE.PlaneGeometry( 2500, 1500, 1, 1 );
+            
             var checkerboard = new THREE.Mesh( Geometry, Material );
             checkerboard.position.x = -2500;
             checkerboard.position.y = -300;
@@ -473,7 +271,7 @@
             Board.add( checkerboard );
             //Рабочее поле горизонтальное
             var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
-            var Geometry2 = new THREE.PlaneGeometry( 800, 3000, 1, 1 );
+            var Geometry2 = new THREE.PlaneGeometry( 800, 2500, 1, 1 );
             var checkerboard2 = new THREE.Mesh( Geometry2, Material2 );
             checkerboard2.position.x = -2100;
             checkerboard2.position.y = -769;
@@ -481,16 +279,12 @@
             Board.add( checkerboard2 ); scene.add( Board );
 
             
-
-
-
-
             
             //Перемещение объектов
             eventControl = new EventControls( [ ... dragObjects ], camera, renderer.domElement );
             eventControl.setDraggable( render, true );              
             eventControl.setMap ( Board );
-            //eventControl.setOrbitControl( controls );          
+            eventControl.setOrbitControl( controls );          
             eventControl.attachEvent( 'dragAndDrop', function () {
                 this.event.object.parent.remove(this.event.object);
                 scene.add(this.event.object);
@@ -505,7 +299,6 @@
             
             
             eventControl.attachEvent( 'mouseUp', function () {
-                this.event.object.parent.remove(this.event.object);
                 scene.add(this.event.object);
                 this.event.object.position.z = 300 + 200 * Math.round((this.event.object.position.z - 300) / 200);
                 let key = false;
@@ -517,18 +310,142 @@
                 if ( this.event.object.position.y > -700 && this.event.object.position.x != 0 && key ) { 
                     addObject(this.event.object)
                 } else {
-                    this.event.object.position.copy( array_pos[ this.event.item ] ); 
+                    removeObject(this.event.object)
                     for (let i = 1; i < meh.children.length; i++) {
-                        for (let j = 0; j < meh.children[i].children.length; j++){
-                            meh.children[i].children[j].position.y = -120 - 180*j;
-                        };
+                        for (let j = 0; j < meh.children[i].children.length; j++) {
+                            meh.children[i].children[j].position.y = -120 - 180 * j;
+                        }
                     }
                 }
                 if (document.getElementById('progress')) {
                     close();
                     workProgress();
                 }
+                const taskButtons = document.querySelectorAll('.task-buttons');
+                if (taskButtons[0].style.display != 'none') {
+                    checkTaskCompletion(); 
+                }
             });
+            
+            var taskBoard = new THREE.Group();
+            const task1Button = document.getElementById("task1Button");
+            task1Button.addEventListener("click", function() {
+                close();
+                defaultPosition();
+                taskMessage('Уравновесить рычаг используя доступные грузы');
+                task1Button.style.backgroundColor = '#555'; 
+                task1Button.style.color = '#ff0';
+                for (let i = 0; i < 10; i++) {
+                    if (i != 5 && i != 6 && i != 7) {
+                        obj[i].position.y = -6000;
+                    }
+                }
+                var taskSinker1 = createSinker(2, -2200 ,-600, 100);
+                addObject(taskSinker1)
+                var taskSinker2 = createSinker(4, -2200, -600, 500);
+                addObject(taskSinker2)
+                if (!task1BoardCherker) {
+                    var task1Board = new THREE.Group();
+                    var Material = new THREE.MeshPhongMaterial( { color: 0xD3D3D3, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
+                    var Geometry = new THREE.PlaneGeometry( 1250, 1500, 1, 1 );
+                    var checkerboard1 = new THREE.Mesh( Geometry, Material );
+                    checkerboard1.position.x = -2500;
+                    checkerboard1.position.z = -700;
+                    checkerboard1.position.y = -300;
+                    checkerboard1.rotation.y =  Math.PI / 2;
+                    task1Board.add( checkerboard1 );
+                    var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
+                    var Geometry2 = new THREE.PlaneGeometry( 800, 1250, 1, 1 );
+                    var checkerboard2 = new THREE.Mesh( Geometry2, Material2 );
+                    checkerboard2.position.x = -2100;
+                    checkerboard2.position.z = -700;
+                    checkerboard2.position.y = -769;
+                    checkerboard2.rotation.x =  Math.PI / 2;
+                    task1Board.add( checkerboard2 ); 
+                    scene.add(task1Board);
+                    task1BoardCherker = true;
+                }
+                eventControl.setMap (task1Board);
+            });
+
+            var task2Board = new THREE.Group();
+            const task2Button = document.getElementById("task2Button");
+            task2Button.addEventListener("click", function() {
+                close();
+                defaultPosition();
+                taskMessage('Уравновесить рычаг используя доступные грузы');
+                task2Button.style.backgroundColor = '#555'; 
+                task2Button.style.color = '#ff0';
+                for (let i = 0; i < 10; i++) {
+                    if (i != 0 && i != 1 && i != 2 && i != 3) {
+                        obj[i].position.y = -6000;
+                    }
+                }
+
+                var taskSinker1 = createSinker(4, -2200 ,-600, -100);
+                addObject(taskSinker1)
+                var taskSinker2 = createSinker(4, -2200 ,-600, -100);
+                addObject(taskSinker2)
+                var taskSinker3 = createSinker(1, -2200 ,-600, -300);
+                addObject(taskSinker3)
+                var taskSinker4 = createSinker(2, -2200 ,-600, -300);
+                addObject(taskSinker4)
+                var taskSinker5 = createSinker(3, -2200 ,-600, -500);
+                addObject(taskSinker5)
+                var taskSinker6 = createSinker(1, -2200 ,-600, -700);
+                addObject(taskSinker6)
+                if (!task2BoardCherker) {
+                    var Material = new THREE.MeshPhongMaterial( { color: 0xD3D3D3, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
+                    var Geometry = new THREE.PlaneGeometry( 1250, 1500, 1, 1 );
+                    var checkerboard1 = new THREE.Mesh( Geometry, Material );
+                    checkerboard1.position.x = -2500;
+                    checkerboard1.position.z = 700;
+                    checkerboard1.position.y = -300;
+                    checkerboard1.rotation.y =  Math.PI / 2;
+                    task2Board.add( checkerboard1 );
+                    var Material2 = new THREE.MeshPhongMaterial( { color: 0x0F0FF0, side: THREE.DoubleSide, transparent: true, opacity: 0 } );
+                    var Geometry2 = new THREE.PlaneGeometry( 800, 1250, 1, 1 );
+                    var checkerboard2 = new THREE.Mesh( Geometry2, Material2 );
+                    checkerboard2.position.x = -2100;
+                    checkerboard2.position.z = 700;
+                    checkerboard2.position.y = -769;
+                    checkerboard2.rotation.x =  Math.PI / 2;
+                    task2Board.add( checkerboard2 ); 
+                    scene.add(task2Board);
+                    task2BoardCherker = true;
+                }
+                eventControl.setMap (task2Board);
+            });
+
+            var task3Board = new THREE.Group();
+            const task3Button = document.getElementById("task3Button");
+            task3Button.addEventListener("click", function() {
+                close();
+                defaultPosition();
+                taskMessage('Уравновесить рычаг используя доступные грузы');
+                task3Button.style.backgroundColor = '#555'; 
+                task3Button.style.color = '#ff0';
+                for (let i = 0; i < 10; i++) {
+                    if (i != 5) {
+                        obj[i].position.y = -6000;
+                    }
+                }
+                var taskSinker1 = createSinker(1, -2200 ,-600, 700);
+                addObject(taskSinker1)
+                var taskSinker2 = createSinker(1, -2200 ,-600, 700);
+                addObject(taskSinker2)
+                var taskSinker3 = createSinker(3, -2200 ,-600, 300);
+                addObject(taskSinker3)
+                var taskSinker4 = createSinker(4, -2200 ,-600, 300);
+                addObject(taskSinker4)
+                var taskSinker5 = createSinker(1, -2200 ,-600, -300);
+                addObject(taskSinker5)
+                var taskSinker6 = createSinker(2, -2200 ,-600, -500);
+                addObject(taskSinker6)
+                var taskSinker7 = createSinker(3, -2200 ,-600, -700);
+                addObject(taskSinker7)
+            });
+
         }
 
         // EVENT HANDLERS
@@ -537,12 +454,11 @@
 
 
         function onWindowResize() {
-
-            camera.aspect = window.innerWidth / window.innerHeight;
+            var container = document.querySelector('.main-content div');
+            camera.aspect = container.clientWidth / container.clientHeight;
             camera.updateProjectionMatrix();
-
-            renderer.setSize( window.innerWidth, window.innerHeight );
-
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            render();
         }
 
         
@@ -622,14 +538,67 @@
             equalize();
         });
 
+        // Кнопка задание
+        const taskButton = document.getElementById("taskButton");
+        taskButton.addEventListener("click", function() {
+            toggleTasks();
+            close();
+        });
+        // Кнопка назад
+        const backButton = document.getElementById("backButton");
+        backButton.addEventListener("click", function() {
+            toggleTasks();
+            close();
+        });
+        
+        
+
+        function toggleTasks() {
+            close();
+            const mainButtons = document.querySelectorAll('.menu-buttons');
+            const taskButtons = document.querySelectorAll('.task-buttons');
+            if (taskButtons[0].style.display === 'none') {
+                taskButtons.forEach(button => button.style.display = 'block');
+                mainButtons.forEach(button => button.style.display = 'none');
+            } else {
+                taskButtons.forEach(button => button.style.display = 'none');
+                mainButtons.forEach(button => button.style.display = 'block');
+            }
+            defaultPosition();
+        }
+
+        function defaultPosition() {
+            obj.forEach(sinker => {
+                meh.children.forEach(child => {
+                    if (child.children.includes(sinker)) {
+                        child.remove(sinker);
+                    }
+                });
+                
+                removeObject(sinker);
+                scene.add(sinker);
+            });
+        }
+        
         function close() {
             if (document.getElementById('theory')) document.getElementById('theory').remove();
             if (document.getElementById('progress')) document.getElementById('progress').remove();
-        }
+            if (document.getElementById('taskMessageOverlay'))  document.getElementById('taskMessageOverlay').remove();
+            var taskButtons = document.querySelectorAll('.task-buttons');
+            taskButtons.forEach(button => button.style.backgroundColor = '');
+            taskButtons.forEach(button => button.style.color = '');
+            eventControl.setMap ( Board );
 
+            if (obj.length > 10) {
+                for ( let i = 10; i < obj.length; i ++) {
+                    obj[i].parent.remove(obj[i]);
+                }
+                obj = obj.slice(0, 10);
+            }
+        }
         function openTheory() {
             // Создаем div-элемент
-            var container = document.querySelector('.container');
+            var container = document.querySelector('.main-content');
             var theory = document.createElement('div');
             theory.className = 'theory';
             theory.id = 'theory';
@@ -659,7 +628,7 @@
         }
 
         function workProgress() {
-            var container = document.querySelector('.container');
+            var container = document.querySelector('.main-content');
             var progress = document.createElement('div');
             progress.id = 'progress';
 
@@ -841,6 +810,12 @@
             }
             
         }
+        function removeObject(object) {
+            const index = obj.findIndex(item => item === object);
+            if (index !== -1) {
+                object.position.copy(array_pos[index]);
+            }
+        }
 
         function notification(message) {
             if (!document.getElementById('notification')) {
@@ -849,13 +824,48 @@
                 notification.textContent = message;
                 notification.style.position = 'fixed';
                 notification.style.top = '15%'; // Расположение сверху экрана
-                notification.style.left = '50%';
+                notification.style.left = '55%';
                 notification.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
                 notification.style.color = 'red'; // Красный цвет текста
                 notification.style.zIndex = '9999';
                 notification.style.transition = 'opacity 1.5s ease-out'; // Плавное исчезновение
                 notification.style.userSelect = 'none';
                 notification.style.fontSize = '20px';
+                // Добавляем уведомление на страницу
+                var main = document.querySelector('.main-content');
+                main.appendChild(notification);
+                // Устанавливаем таймер для удаления уведомления через некоторое время
+                setTimeout(function() {
+                    notification.style.opacity = '0'; // Устанавливаем прозрачность на 0 для плавного исчезновения
+                    setTimeout(function() {
+                        document.getElementById('notification').remove(); // Удаляем уведомление после завершения анимации
+                    }, 1500); // Ждем 1.5 секунды (время анимации)
+                }, 1000);
+            }
+        }
+
+        function checkTaskCompletion() {
+            var m = moment();
+            let sum = m.map(Number).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            console.log(sum);
+            if (sum == 0) {
+                congratulations('Верно')
+            }
+        }
+        function congratulations(message) {
+            if (!document.getElementById('notification')) {
+                var notification = document.createElement('div');
+                notification.id = 'notification';
+                notification.textContent = message;
+                notification.style.position = 'fixed';
+                notification.style.top = '15%'; // Расположение сверху экрана
+                notification.style.left = '55%';
+                notification.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
+                notification.style.color = 'green'; 
+                notification.style.zIndex = '9999';
+                notification.style.transition = 'opacity 2.5s ease-out'; // Плавное исчезновение
+                notification.style.userSelect = 'none';
+                notification.style.fontSize = '26px';
                 // Добавляем уведомление на страницу
                 document.body.appendChild(notification);
                 // Устанавливаем таймер для удаления уведомления через некоторое время
@@ -866,6 +876,16 @@
                     }, 1500); // Ждем 1.5 секунды (время анимации)
                 }, 1000);
             }
+        }
+        function taskMessage(taskText) {
+            let overlay = document.getElementById('taskMessageOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'taskMessageOverlay';
+                document.body.appendChild(overlay);
+            }
+            overlay.innerHTML = `<span>${taskText}</span>`;
+            overlay.style.display = 'block';
         }
 
     </script>
