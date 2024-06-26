@@ -251,8 +251,8 @@
             scene.add(meh);
             for (let i = -900; i <= 900; i += 200) {
                 const pos = new THREE.Group();
-                pos.name = i;  // Измените имя по своему усмотрению
-                pos.position.z = i;  // Rоордината z на основе счетчика цикла
+                pos.name = i;  
+                pos.position.z = i;  // Координата z на основе счетчика цикла
                 pos.position.y = -40;
                 pos.force = 0;
                 meh.add(pos);
@@ -823,30 +823,34 @@
                 notification.id = 'notification';
                 notification.textContent = message;
                 notification.style.position = 'fixed';
-                notification.style.top = '15%'; // Расположение сверху экрана
+                notification.style.top = '15%'; 
                 notification.style.left = '55%';
-                notification.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
-                notification.style.color = 'red'; // Красный цвет текста
+                notification.style.transform = 'translateX(-50%)'; 
+                notification.style.color = 'red'; 
                 notification.style.zIndex = '9999';
-                notification.style.transition = 'opacity 1.5s ease-out'; // Плавное исчезновение
+                notification.style.transition = 'opacity 1.5s ease-out'; 
                 notification.style.userSelect = 'none';
                 notification.style.fontSize = '20px';
-                // Добавляем уведомление на страницу
                 var main = document.querySelector('.main-content');
                 main.appendChild(notification);
-                // Устанавливаем таймер для удаления уведомления через некоторое время
                 setTimeout(function() {
-                    notification.style.opacity = '0'; // Устанавливаем прозрачность на 0 для плавного исчезновения
+                    notification.style.opacity = '0'; 
                     setTimeout(function() {
-                        document.getElementById('notification').remove(); // Удаляем уведомление после завершения анимации
-                    }, 1500); // Ждем 1.5 секунды (время анимации)
+                        document.getElementById('notification').remove(); 
+                    }, 1500); 
                 }, 1000);
             }
         }
 
         function checkTaskCompletion() {
             var m = moment();
-            let sum = m.map(Number).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            // let sum = m.map(Number).reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            let sum = 0;
+            for (let i=0; i<m.length; i++) {
+                sum += Number(m[i]);
+            }
+            sum = sum.toFixed(2);
+            console.log(moment());
             console.log(sum);
             if (sum == 0) {
                 congratulations('Верно')
@@ -858,22 +862,20 @@
                 notification.id = 'notification';
                 notification.textContent = message;
                 notification.style.position = 'fixed';
-                notification.style.top = '15%'; // Расположение сверху экрана
+                notification.style.top = '15%'; 
                 notification.style.left = '55%';
-                notification.style.transform = 'translateX(-50%)'; // Центрирование по горизонтали
+                notification.style.transform = 'translateX(-50%)'; 
                 notification.style.color = 'green'; 
                 notification.style.zIndex = '9999';
-                notification.style.transition = 'opacity 2.5s ease-out'; // Плавное исчезновение
+                notification.style.transition = 'opacity 2.5s ease-out'; 
                 notification.style.userSelect = 'none';
                 notification.style.fontSize = '26px';
-                // Добавляем уведомление на страницу
                 document.body.appendChild(notification);
-                // Устанавливаем таймер для удаления уведомления через некоторое время
                 setTimeout(function() {
-                    notification.style.opacity = '0'; // Устанавливаем прозрачность на 0 для плавного исчезновения
+                    notification.style.opacity = '0'; 
                     setTimeout(function() {
-                        document.getElementById('notification').remove(); // Удаляем уведомление после завершения анимации
-                    }, 1500); // Ждем 1.5 секунды (время анимации)
+                        document.getElementById('notification').remove(); 
+                    }, 1500); 
                 }, 1000);
             }
         }
